@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ritej 🌸</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+<style>
+/* ── TOKENS ── */
+:root {
+  --bg:     #0d0008;
+  --bgm:    #150010;
+  --hot:    #ff3d78;
+  --candy:  #ff85ab;
+  --blush:  #ffc2d4;
+  --petal:  #fff0f7;
+  --gold:   #f5d08a;
+  --goldl:  #fff3cc;
+  --white:  #ffffff;
+  --muted:  rgba(255,255,255,0.38);
+  --mutedl: rgba(255,255,255,0.18);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--white);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ── STAR CANVAS ── */
+#stars {
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 0;
+}
+
+/* ── AMBIENT GLOW ORBS ── */
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
+  animation: orbDrift ease-in-out infinite alternate;
+}
+.orb1 { width:500px; height:500px; background:rgba(255,61,120,.1); top:-150px; left:-100px; animation-duration:11s; }
+.orb2 { width:400px; height:400px; background:rgba(245,208,138,.07); bottom:-100px; right:-80px; animation-duration:14s; animation-delay:3s; }
+.orb3 { width:300px; height:300px; background:rgba(255,133,171,.06); top:40%; left:55%; animation-duration:9s; animation-delay:1.5s; }
+@keyframes orbDrift {
+  from { transform: scale(1) translate(0,0); }
+  to   { transform: scale(1.15) translate(30px, 20px); }
+}
+
+/* ── FLOATING PETALS ── */
+.petal-wrap { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+.fp {
+  position: absolute;
+  font-size: 1.1rem; opacity: 0;
+  animation: petalFall linear infinite;
+}
+@keyframes petalFall {
+  0%   { opacity:0; transform:translateY(-20px) rotate(0deg); }
+  8%   { opacity:.35; }
+  92%  { opacity:.18; }
+  100% { opacity:0; transform:translateY(105vh) rotate(720deg); }
+}
+
+/* ── MAIN LAYOUT ── */
+#main {
+  position: relative; z-index: 1;
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 3rem 1.5rem 4rem;
+  text-align: center;
+}
+
+/* ── TOP LABEL ── */
+.top-label {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .28em;
+  text-transform: uppercase;
+  color: var(--candy);
+  opacity: .8;
+  margin-bottom: 2.2rem;
+  display: flex; align-items: center; gap: .7rem;
+}
+.top-label::before,
+.top-label::after {
+  content: '';
+  width: 32px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--candy));
+}
+.top-label::after { background: linear-gradient(90deg, var(--candy), transparent); }
+
+/* ── KITTY ── */
+#hero-kitty {
+  width: 140px;
+  filter: drop-shadow(0 0 40px rgba(255,61,120,.55)) drop-shadow(0 0 80px rgba(255,61,120,.2));
+  animation: kittyFloat 4s ease-in-out infinite;
+  margin-bottom: 1.8rem;
+}
+@keyframes kittyFloat {
+  0%,100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-16px) rotate(2deg); }
+}
+
+/* ── HEADING ── */
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.6rem, 5vw, 2.8rem);
+  font-weight: 300;
+  color: var(--white);
+  letter-spacing: .04em;
+  line-height: 1.3;
+  margin-bottom: .6rem;
+  opacity: .9;
+}
+.hero-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3.2rem, 11vw, 6.5rem);
+  font-weight: 600;
+  font-style: italic;
+  line-height: 1;
+  margin-bottom: 1.2rem;
+  background: linear-gradient(135deg, var(--hot) 0%, #ff9ec8 45%, var(--gold) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmerName 4s linear infinite;
+}
+@keyframes shimmerName { to { background-position: 200% center; } }
+
+.hero-sub {
+  font-size: .82rem;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 3.5rem;
+}
+
+/* ── COUNTDOWN ── */
+.countdown-wrap {
+  display: flex;
+  gap: clamp(.8rem, 3vw, 2rem);
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 3.5rem;
+}
+
+.cd-unit {
+  display: flex; flex-direction: column; align-items: center;
+  min-width: clamp(64px, 18vw, 110px);
+}
+
+.cd-box {
+  position: relative;
+  width: clamp(64px, 18vw, 110px);
+  height: clamp(64px, 18vw, 110px);
+  background: rgba(255,255,255,.03);
+  border: 1px solid rgba(255,61,120,.18);
+  border-radius: clamp(12px, 3vw, 20px);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 0 0 0 rgba(255,61,120,0), inset 0 1px 0 rgba(255,255,255,.06);
+  transition: box-shadow .4s;
+}
+.cd-box::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 50%;
+  background: rgba(255,255,255,.025);
+  pointer-events: none;
+}
+
+.cd-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 8vw, 4.5rem);
+  font-weight: 600;
+  color: var(--white);
+  line-height: 1;
+  transition: transform .15s ease;
+  position: relative; z-index: 1;
+}
+.cd-num.flip {
+  animation: numFlip .28s ease;
+}
+@keyframes numFlip {
+  0%  { transform: translateY(-8px); opacity:.4; }
+  100%{ transform: translateY(0); opacity:1; }
+}
+
+.cd-label {
+  font-size: clamp(.6rem, 1.8vw, .72rem);
+  font-weight: 700;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--candy);
+  opacity: .65;
+  margin-top: .6rem;
+}
+
+/* separator dots */
+.cd-sep {
+  font-size: clamp(1.5rem, 5vw, 2.8rem);
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--hot);
+  opacity: .5;
+  align-self: center;
+  padding-bottom: 1.6rem;
+  animation: sepBlink 1.2s ease-in-out infinite;
+}
+@keyframes sepBlink { 0%,100%{opacity:.5} 50%{opacity:.15} }
+
+/* ── DATE BADGE ── */
+.date-badge {
+  display: inline-flex; align-items: center; gap: .6rem;
+  border: 1px solid rgba(255,61,120,.22);
+  border-radius: 99px;
+  padding: .45rem 1.3rem;
+  font-size: .75rem; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--candy); opacity: .8;
+  backdrop-filter: blur(8px);
+  background: rgba(255,61,120,.06);
+}
+
+/* ── ALREADY HAPPENED ── */
+#already {
+  display: none;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.4rem,4vw,2.2rem);
+  font-style: italic;
+  color: var(--candy);
+  opacity: .8;
+  text-align: center;
+  padding: 1rem;
+}
+
+/* ══════════════════════════════
+   BIRTHDAY OVERLAY — fires at 0
+══════════════════════════════ */
+#bday-overlay {
+  position: fixed; inset: 0; z-index: 9000;
+  display: none;
+  flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 2rem;
+  background: radial-gradient(ellipse at center, #1a0010 0%, #0a0005 100%);
+  overflow: hidden;
+}
+#bday-overlay.show { display: flex; }
+
+/* firework canvas lives behind overlay content */
+#fw-canvas {
+  position: fixed; inset: 0; z-index: 8999;
+  pointer-events: none;
+}
+
+.bday-kitty {
+  width: 130px;
+  filter: drop-shadow(0 0 60px rgba(255,61,120,.9));
+  animation: kittyFloat 3s ease-in-out infinite;
+  margin-bottom: 1.4rem;
+  opacity: 0;
+}
+
+.bday-burst {
+  font-size: 2.8rem;
+  margin-bottom: 1rem;
+  opacity: 0;
+  letter-spacing: .4rem;
+}
+
+.bday-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.4rem, 9vw, 5rem);
+  font-weight: 600;
+  font-style: italic;
+  line-height: 1.05;
+  color: var(--white);
+  text-shadow: 0 0 80px rgba(255,61,120,.7);
+  opacity: 0;
+  margin-bottom: .5rem;
+  text-align: center;
+}
+.bday-heading span {
+  background: linear-gradient(135deg, var(--hot), #ff9ec8, var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  background-size: 200% auto; animation: shimmerName 3s linear infinite;
+}
+
+.bday-sub {
+  font-size: .8rem; font-weight: 700;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--candy); opacity: 0; margin-bottom: 2.5rem;
+}
+
+/* ── ENVELOPE BUTTON ── */
+#open-letter-btn {
+  position: relative;
+  background: none; border: none; cursor: pointer;
+  opacity: 0;
+  transform: scale(.8);
+  transition: transform .2s;
+}
+#open-letter-btn:hover { transform: scale(1.06); }
+
+.envelope {
+  width: 200px; height: 140px;
+  position: relative;
+  filter: drop-shadow(0 12px 40px rgba(255,61,120,.45));
+  animation: envFloat 3s ease-in-out infinite;
+}
+@keyframes envFloat {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+
+/* envelope SVG built inline */
+.env-body {
+  width: 200px; height: 140px;
+}
+
+.env-hint {
+  font-size: .7rem; font-weight: 800;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--candy); margin-top: .8rem;
+  animation: hintBlink .9s step-end infinite;
+}
+@keyframes hintBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* ══════════════════════════════
+   LETTER MODAL
+══════════════════════════════ */
+#letter-modal {
+  position: fixed; inset: 0; z-index: 9999;
+  display: none; align-items: center; justify-content: center;
+  padding: 1.5rem;
+  background: rgba(10,0,5,.85);
+  backdrop-filter: blur(16px);
+  overflow-y: auto;
+}
+#letter-modal.show { display: flex; }
+
+.letter-sheet {
+  position: relative;
+  background: white;
+  border-radius: 4px;
+  max-width: 580px; width: 100%;
+  padding: 3.5rem 3rem 3rem;
+  color: #2a0018;
+  box-shadow: 0 40px 120px rgba(0,0,0,.6), 0 0 0 1px rgba(255,61,120,.12);
+  animation: letterOpen .6s cubic-bezier(.22,1,.36,1) both;
+  overflow: hidden;
+}
+@keyframes letterOpen {
+  from { opacity:0; transform:scale(.88) translateY(30px) rotate(-1deg); }
+  to   { opacity:1; transform:none; }
+}
+
+/* top stripe */
+.letter-sheet::before {
+  content: '';
+  position: absolute; top:0; left:0; right:0; height:8px;
+  background: repeating-linear-gradient(90deg,
+    var(--hot) 0,var(--hot) 14px,
+    #ff9ec8 14px,#ff9ec8 28px,
+    var(--gold) 28px,var(--gold) 42px,
+    #ffe8f0 42px,#ffe8f0 56px
+  );
+}
+
+/* wax seal top right */
+.wax-seal {
+  position: absolute; top: 1.4rem; right: 1.6rem;
+  width: 52px; height: 52px;
+  background: radial-gradient(circle at 38% 38%, #ff6b9d, var(--hot));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  box-shadow: 0 4px 16px rgba(255,61,120,.4);
+  transform: rotate(12deg);
+}
+
+.letter-date {
+  font-size: .72rem; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase;
+  color: rgba(60,0,30,.4);
+  margin-bottom: 1.8rem; margin-top: .4rem;
+}
+
+.letter-greeting {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 600;
+  color: #2a0018;
+  margin-bottom: 1.6rem;
+  line-height: 1.2;
+}
+.letter-greeting span { color: var(--hot); }
+
+.letter-body {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1rem, 2.5vw, 1.15rem);
+  font-weight: 400;
+  line-height: 2;
+  color: #3a0020;
+}
+.letter-body p { margin-bottom: 1.3rem; }
+.letter-body strong { font-weight: 600; color: #2a0018; }
+.letter-body em { font-style: italic; color: #c2185b; }
+
+.letter-sign {
+  margin-top: 2.2rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--hot);
+  text-align: right;
+  line-height: 1.4;
+}
+.letter-sign small {
+  display: block;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .78rem;
+  font-style: normal;
+  font-weight: 700;
+  color: rgba(60,0,30,.45);
+  margin-top: .3rem;
+  letter-spacing: .06em;
+}
+
+.letter-ps {
+  margin-top: 1.6rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid rgba(255,61,120,.15);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: .95rem;
+  font-style: italic;
+  color: rgba(60,0,30,.5);
+  line-height: 1.7;
+}
+
+.close-letter {
+  position: absolute; top: 1rem; left: 1.2rem;
+  background: none; border: none; cursor: pointer;
+  font-size: .7rem; font-weight: 800;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: rgba(60,0,30,.35);
+  transition: color .2s;
+  font-family: 'DM Sans', sans-serif;
+  padding: .3rem .5rem;
+}
+.close-letter:hover { color: var(--hot); }
+
+@media(max-width: 520px) {
+  .letter-sheet { padding: 3rem 1.4rem 2rem; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+<canvas id="fw-canvas"></canvas>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+<div class="petal-wrap" id="petals"></div>
+
+<!-- ══ COUNTDOWN PAGE ══ -->
+<div id="main">
+  <div class="top-label">counting every second</div>
+
+  <img id="hero-kitty"
+       src="https://pngimg.com/uploads/hello_kitty/hello_kitty_PNG37.png"
+       alt="Hello Kitty">
+
+  <p class="hero-title">getting closer to</p>
+  <div class="hero-name">Ritej</div>
+  <p class="hero-sub">Tunisia time &nbsp; UTC+1</p>
+
+  <div class="countdown-wrap" id="cdWrap">
+    <div class="cd-unit">
+      <div class="cd-box"><span class="cd-num" id="cd-days">00</span></div>
+      <div class="cd-label">Days</div>
+    </div>
+    <div class="cd-sep">&#8226;</div>
+    <div class="cd-unit">
+      <div class="cd-box"><span class="cd-num" id="cd-hours">00</span></div>
+      <div class="cd-label">Hours</div>
+    </div>
+    <div class="cd-sep">&#8226;</div>
+    <div class="cd-unit">
+      <div class="cd-box"><span class="cd-num" id="cd-mins">00</span></div>
+      <div class="cd-label">Minutes</div>
+    </div>
+    <div class="cd-sep">&#8226;</div>
+    <div class="cd-unit">
+      <div class="cd-box"><span class="cd-num" id="cd-secs">00</span></div>
+      <div class="cd-label">Seconds</div>
+    </div>
+  </div>
+
+  <div class="date-badge">
+    <span>🌸</span>
+    June 15 at midnight &nbsp; Tunisia
+    <span>🌸</span>
+  </div>
+
+  <div id="already">
+    <p>Her birthday is here 🎀<br>Tap below to open the surprise</p>
+  </div>
+</div>
+
+<!-- ══ BIRTHDAY OVERLAY ══ -->
+<div id="bday-overlay">
+  <img class="bday-kitty" id="bdayKitty"
+       src="https://pngimg.com/uploads/hello_kitty/hello_kitty_PNG35.png" alt="HK">
+  <div class="bday-burst" id="bdayBurst">🎀 🌸 💕 🎉 💖</div>
+  <h1 class="bday-heading" id="bdayHead">Happy Birthday<br><span>Ritej</span></h1>
+  <p class="bday-sub" id="bdaySub">June 15 &nbsp; Your most beautiful day yet</p>
+  <button id="open-letter-btn" onclick="openLetter()">
+    <div class="envelope">
+      <svg class="env-body" viewBox="0 0 200 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- envelope back -->
+        <rect x="2" y="2" width="196" height="136" rx="10" fill="#fff0f7" stroke="#ffc2d4" stroke-width="2"/>
+        <!-- envelope flap (open) -->
+        <path d="M2 2 L100 72 L198 2 Z" fill="#ffd6e8" stroke="#ffb3c8" stroke-width="1.5" stroke-linejoin="round"/>
+        <!-- left triangle -->
+        <path d="M2 2 L2 138 L85 70 Z" fill="#ffe4f0" stroke="#ffb3c8" stroke-width="1"/>
+        <!-- right triangle -->
+        <path d="M198 2 L198 138 L115 70 Z" fill="#ffe4f0" stroke="#ffb3c8" stroke-width="1"/>
+        <!-- bottom fold -->
+        <path d="M2 138 L85 70 L100 80 L115 70 L198 138 Z" fill="#ffcce0" stroke="#ffb3c8" stroke-width="1"/>
+        <!-- bow on top -->
+        <ellipse cx="100" cy="56" rx="10" ry="10" fill="#ff3d78"/>
+        <path d="M100 56 L80 44 L80 68 Z" fill="#ff6b9d"/>
+        <path d="M100 56 L120 44 L120 68 Z" fill="#ff6b9d"/>
+        <circle cx="100" cy="56" r="6" fill="#c2185b"/>
+        <!-- heart on envelope body -->
+        <path d="M94 95 C94 91 88 87 88 92 C88 97 94 102 94 102 C94 102 100 97 100 92 C100 87 94 91 94 95 Z" fill="#ff3d78" opacity=".4"/>
+      </svg>
+    </div>
+    <p class="env-hint">tap to open your letter 💌</p>
+  </button>
+</div>
+
+<!-- ══ LETTER MODAL ══ -->
+<div id="letter-modal">
+  <div class="letter-sheet">
+    <button class="close-letter" onclick="closeLetter()">close</button>
+    <div class="wax-seal">🎀</div>
+
+    <div class="letter-date">June 15 &nbsp; For Ritej &nbsp; Always</div>
+
+    <div class="letter-greeting">
+      My dearest <span>Ritej</span>
+    </div>
+
+    <div class="letter-body">
+      <p>
+        Today is the day the world became a better place. Not because something grand happened out there in the universe but because <strong>you arrived in it.</strong> And I want you to feel that today in every breath you take.
+      </p>
+      <p>
+        I think about what it means to know you and I keep arriving at the same feeling <em>wonder.</em> Wonder that someone can hold so much warmth inside them. Wonder that a person can walk into a room and make the whole air feel softer. Wonder that I get to call you mine and that you chose me too out of everyone in this enormous world.
+      </p>
+      <p>
+        You carry love the way some people carry light <strong>without even trying</strong> without even noticing it yourself. But I notice it. I notice it every single time. Every small act of care you offer every quiet moment of tenderness every time you laugh that laugh that makes me forget what I was worried about.
+      </p>
+      <p>
+        On this birthday I want you to receive every ounce of what you pour into the world. I want it to come back to you a hundred times over. I want you to feel seen and adored and celebrated not just today but in the way you deserve to be celebrated every ordinary morning that follows.
+      </p>
+      <p>
+        You are the kind of love people write about when they finally understand what love really is. <em>Not the loud kind.</em> The kind that stays. The kind that makes home feel like a feeling instead of a place. That is what you are to me. My home. My calm. My favorite person on this earth.
+      </p>
+      <p>
+        <strong>Happy birthday Retouja.</strong> May this year hold everything your heart has been quietly hoping for. You deserve it all.
+      </p>
+    </div>
+
+    <div class="letter-sign">
+      Yours entirely 💕
+      <small>with every piece of love I have</small>
+    </div>
+
+    <div class="letter-ps">
+      Hello Kitty also sends her love. She has always known you were special.
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════
+   STAR FIELD
+════════════════════════ */
+(function(){
+  const c=document.getElementById('stars');
+  const ctx=c.getContext('2d');
+  let W,H,stars=[];
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  resize(); window.addEventListener('resize',resize);
+  for(let i=0;i<180;i++) stars.push({
+    x:Math.random()*9999,y:Math.random()*9999,
+    r:.3+Math.random()*.9,
+    a:Math.random(),da:(Math.random()-.5)*.008,
+    speed:.015+Math.random()*.03
+  });
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    stars.forEach(s=>{
+      s.x=(s.x+s.speed)%(W+10);
+      s.a=Math.max(.05,Math.min(1,s.a+s.da));
+      if(s.a<=.05||s.a>=1) s.da*=-1;
+      ctx.beginPath();
+      ctx.arc(s.x%W,s.y%H,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${s.a})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ════════════════════════
+   PETALS
+════════════════════════ */
+(function(){
+  const wrap=document.getElementById('petals');
+  const em=['🌸','💕','🎀','✨','💫','🌺'];
+  for(let i=0;i<18;i++){
+    const el=document.createElement('div');
+    el.className='fp';
+    el.textContent=em[Math.floor(Math.random()*em.length)];
+    el.style.left=Math.random()*100+'vw';
+    el.style.fontSize=(.7+Math.random()*.8)+'rem';
+    el.style.animationDuration=(12+Math.random()*16)+'s';
+    el.style.animationDelay=(Math.random()*20)+'s';
+    wrap.appendChild(el);
+  }
+})();
+
+/* ════════════════════════
+   COUNTDOWN
+   Target: June 15 2025 at 00:00 Tunisia (UTC+1)
+   Uses system UTC so it never resets on refresh
+════════════════════════ */
+// Find nearest June 15 midnight Tunisia (UTC+1 = UTC+60min)
+// Tunisia is UTC+1 all year (no DST since 2008)
+function getBirthdayUTC(){
+  // June 15 00:00 Tunisia = June 14 23:00 UTC
+  const now=new Date();
+  const year=now.getUTCFullYear();
+  // June 14 23:00:00 UTC = June 15 00:00 Tunisia
+  let target=new Date(Date.UTC(year,5,14,23,0,0,0)); // month 5 = June
+  // if we've already passed it this year, use next year
+  if(now>=target) target=new Date(Date.UTC(year+1,5,14,23,0,0,0));
+  return target;
+}
+
+const TARGET=getBirthdayUTC();
+let birthdayFired=false;
+
+const elDays =document.getElementById('cd-days');
+const elHours=document.getElementById('cd-hours');
+const elMins =document.getElementById('cd-mins');
+const elSecs =document.getElementById('cd-secs');
+
+function pad(n){return String(Math.max(0,n)).padStart(2,'0');}
+
+function animNum(el,val){
+  const s=pad(val);
+  if(el.textContent!==s){
+    el.classList.remove('flip');
+    void el.offsetWidth;
+    el.classList.add('flip');
+    el.textContent=s;
+    // pulse the box
+    gsap.fromTo(el.closest('.cd-box'),
+      {boxShadow:'0 0 0 2px rgba(255,61,120,.5)'},
+      {boxShadow:'0 0 0 0 rgba(255,61,120,0)',duration:.6,ease:'power2.out'}
+    );
+  }
+}
+
+function tick(){
+  const now=new Date();
+  const diff=TARGET-now;
+
+  if(diff<=0){
+    // set all to 0 once
+    animNum(elDays,0); animNum(elHours,0); animNum(elMins,0); animNum(elSecs,0);
+    if(!birthdayFired){ birthdayFired=true; triggerBirthday(); }
+    return;
+  }
+
+  const totalSecs=Math.floor(diff/1000);
+  const secs=totalSecs%60;
+  const mins=Math.floor(totalSecs/60)%60;
+  const hours=Math.floor(totalSecs/3600)%24;
+  const days=Math.floor(totalSecs/86400);
+
+  animNum(elDays,days);
+  animNum(elHours,hours);
+  animNum(elMins,mins);
+  animNum(elSecs,secs);
+}
+
+tick();
+setInterval(tick,1000);
+
+/* ════════════════════════
+   BIRTHDAY TRIGGER
+════════════════════════ */
+function triggerBirthday(){
+  // hide countdown
+  gsap.to('#main',{opacity:0,scale:.95,duration:.8,ease:'power2.in',onComplete:()=>{
+    document.getElementById('main').style.display='none';
+    showBirthdayOverlay();
+  }});
+}
+
+function showBirthdayOverlay(){
+  const overlay=document.getElementById('bday-overlay');
+  overlay.classList.add('show');
+
+  // entrance sequence
+  const tl=gsap.timeline();
+  tl.from(overlay,{opacity:0,duration:.6,ease:'power2.out'})
+    .to('#bdayKitty',{opacity:1,scale:1,duration:.9,ease:'back.out(1.6)',from:{scale:.3,opacity:0}},'-=.2')
+    .to('#bdayBurst',{opacity:1,y:0,duration:.7,ease:'power3.out',from:{opacity:0,y:20}},'-=.4')
+    .to('#bdayHead', {opacity:1,y:0,duration:.9,ease:'power3.out',from:{opacity:0,y:30}},'-=.4')
+    .to('#bdaySub',  {opacity:.8,y:0,duration:.7,ease:'power3.out',from:{opacity:0,y:20}},'-=.5')
+    .to('#open-letter-btn',{opacity:1,scale:1,duration:.8,ease:'back.out(1.5)'},'-=.3');
+
+  // launch fireworks
+  launchFireworks();
+}
+
+/* ════════════════════════
+   FIREWORKS (canvas-confetti)
+════════════════════════ */
+function launchFireworks(){
+  const colors=['#ff3d78','#ff85ab','#ffc2d4','#ffe045','#e8d4ff','#c8f7ea','#ffffff'];
+  let frame=0;
+
+  function fireFrame(){
+    frame++;
+    // two bursts from sides
+    confetti({
+      particleCount:4, angle:60, spread:55,
+      origin:{x:.05,y:.6}, colors,
+      startVelocity:45, gravity:.9, ticks:200
+    });
+    confetti({
+      particleCount:4, angle:120, spread:55,
+      origin:{x:.95,y:.6}, colors,
+      startVelocity:45, gravity:.9, ticks:200
+    });
+    // occasional big burst from top
+    if(frame%18===0){
+      confetti({
+        particleCount:80, spread:120,
+        origin:{x:.5,y:.1}, colors,
+        startVelocity:55, gravity:.7, ticks:280
+      });
+    }
+    if(frame<300) requestAnimationFrame(fireFrame);
+  }
+  fireFrame();
+  // repeat every 8s
+  setInterval(()=>{
+    frame=0;
+    fireFrame();
+  },8000);
+}
+
+/* ════════════════════════
+   LETTER
+════════════════════════ */
+function openLetter(){
+  const modal=document.getElementById('letter-modal');
+  modal.classList.add('show');
+  // pause fireworks visually? no, let them run
+  gsap.fromTo('.letter-sheet',
+    {opacity:0,scale:.85,rotate:-2},
+    {opacity:1,scale:1,rotate:0,duration:.65,ease:'back.out(1.3)'}
+  );
+  // gentle confetti burst when letter opens
+  confetti({particleCount:120,spread:100,origin:{y:.4},colors:['#ff3d78','#ffc2d4','#ffe045','#fff']});
+}
+function closeLetter(){
+  gsap.to('.letter-sheet',{opacity:0,scale:.9,duration:.3,ease:'power2.in',
+    onComplete:()=>document.getElementById('letter-modal').classList.remove('show')
+  });
+}
+
+/* ════════════════════════
+   DEMO MODE
+   If you want to test the birthday reveal right now,
+   uncomment the line below:
+════════════════════════ */
+// setTimeout(triggerBirthday, 3000);
+
+/* img errors */
+document.querySelectorAll('img').forEach(i=>i.addEventListener('error',()=>i.style.opacity='0'));
+</script>
+</body>
+</html>
